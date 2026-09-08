@@ -1,0 +1,25 @@
+# ninja log v7
+48	102	8098776580300475	CMakeFiles/Heartburner.dir/src/arena.cpp.obj	8d8a419d7681cdd2
+57	265	8098776580511585	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+266	346	8098776583204369	Heartburner_game.dll	6654a060881206c1
+266	346	8098776583204369	Heartburner_game.lib	6654a060881206c1
+36	539	8098776580300475	CMakeFiles/Heartburner.dir/src/main.cpp.obj	b3aeb2f8f9403351
+540	657	8098776585335068	Heartburner.exe	c65217daf9561b06
+2	196	8098777615586601	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+197	279	8098777617530365	Heartburner_game.dll	6654a060881206c1
+197	279	8098777617530365	Heartburner_game.lib	6654a060881206c1
+28	230	8098778180295658	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+231	316	8098778182329535	Heartburner_game.dll	6654a060881206c1
+231	316	8098778182329535	Heartburner_game.lib	6654a060881206c1
+37	248	8098779702768864	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+248	328	8098779704869996	Heartburner_game.dll	6654a060881206c1
+248	328	8098779704869996	Heartburner_game.lib	6654a060881206c1
+25	225	8098780614560653	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+225	304	8098780616563649	Heartburner_game.dll	6654a060881206c1
+225	304	8098780616563649	Heartburner_game.lib	6654a060881206c1
+34	255	8098782006165841	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+255	344	8098782008373587	Heartburner_game.dll	6654a060881206c1
+255	344	8098782008373587	Heartburner_game.lib	6654a060881206c1
+32	234	8098782746247759	CMakeFiles/Heartburner_game.dir/src/game.cpp.obj	a3c63e3f78ecec1a
+234	317	8098782748272532	Heartburner_game.dll	6654a060881206c1
+234	317	8098782748272532	Heartburner_game.lib	6654a060881206c1
