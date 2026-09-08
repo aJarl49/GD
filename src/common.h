@@ -5,3 +5,10 @@
 #define GIGABYTES(n) (MEGABYTES(n) * 1024)
 
 constexpr size_t GAME_MEMORY_ALLOWANCE = MEGABYTES(10);
+constexpr int FPS = 240;
+const double FRAME_TIME_MS = 1000/FPS;
+
+const int SCREEN_WIDTH = 650;
+const int SCREEN_HEIGHT = 400;
+const int UPSCALE_FACTOR = 2;
+const int CELL_SIZE_PX = 16 * UPSCALE_FACTOR;

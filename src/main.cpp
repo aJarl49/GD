@@ -1,12 +1,19 @@
-#include <string>
 #include <windows.h>
+#include <timeapi.h>
+#include <mmsystem.h>
+#include <fstream>
+
+#include <string.h>
 #include <fileapi.h>
 #include <cstdio>
 #include <errhandlingapi.h>
 #include <winnt.h>
+
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_stdinc.h"
 #include "SDL3/SDL_timer.h"
+
 #include "common.h"
 #include "arena.h"
 #include "gameState.h"
@@ -21,7 +28,7 @@ Uint64 PREV = 0;
 constexpr const char* NAME_OF_DLL = "Heartburner_game.dll";
 constexpr const char* NAME_OF_TEMP_DLL = "Heartburner_temp.dll";
 
-typedef void (*Function_Initialize) (GameData* data);
+typedef void (*Function_Initialize) (GameData* data, SDL_Renderer* renderer);
 typedef bool (*Function_HandleEvents) (GameData* data, SDL_Event event);
 typedef void (*Function_Update) (GameData* data, float dt);
 typedef void (*Function_Draw) (GameData* data, SDL_Renderer* renderer);
@@ -101,7 +108,7 @@ void* AllocateGameMemory(){
 
 void SDL_Setup(){
   SDL_Init(SDL_INIT_EVENTS);
-  window = SDL_CreateWindow("Heartburner", 650, 400, 0);
+  window = SDL_CreateWindow("Heartburner", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
   renderer = SDL_CreateRenderer(window, NULL);
 }
 
@@ -121,14 +128,49 @@ void DLL_CheckStatus(DLL_INFO* dll){
   }
 }
 
+void CalculateRemainingFrameTimeMS(double* miliseconds){
+  Uint64 frame_end_time_ns = SDL_GetTicks();
+  double frame_time_spent_ns = frame_end_time_ns - PREV;
+  double frame_time_spent_ms = frame_time_spent_ns/1e6;
+  *miliseconds = FRAME_TIME_MS - frame_time_spent_ms;
+}
+
+void StoreGameState(Memory::Arena* arena){
+  std::ofstream file("temp_state.bin", std::ios::binary);
+  file.write(reinterpret_cast<const char*>(arena->base), arena ->size);
+}
+
+void RetrieveGameStare(Memory::Arena * arena){
+  std::ifstream file("temp_state.bin", std::ios::binary);
+  file.read(reinterpret_cast<char*>(arena->base), arena->size);
+}
+
 int main(){
   void* game_memory = AllocateGameMemory();
-  if(game_memory == nullptr){
-    return 1;
-  }
-  Memory::Arena* arena = new Memory::Arena();
-  Memory::Initialize(arena, game_memory, GAME_MEMORY_ALLOWANCE);
-  GameData* gameData = (GameData*)Memory::Allocate(arena, sizeof(GameData));
+    if(game_memory == nullptr){
+     return 1;
+    }
+  
+    Memory::Arena* arena_main = new Memory::Arena();
+    Memory::Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
+    GameData* gameData = (GameData*)Memory::Allocate(arena_main, sizeof(GameData));
+
+    size_t IMAGE_ARENA_SIZE = sizeof(Image) * 100;
+    gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
+    gameData->arena_levels = Memory::CreateSubArena(arena_main, MEGABYTES(3));
+    gameData->arena_entities = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
+
+    gameData->levels = (LevelData*)Memory::Allocate(gameData->arena_levels, sizeof(LevelData) *12);
+
+    gameData->keys_previous = (bool*)Memory::Allocate(gameData->arena_levels, sizeof(bool) * SDL_SCANCODE_COUNT);
+
+  MMRESULT result = timeBeginPeriod(1);
+    if(result == TIMERR_NOCANDO){
+      printf("Could not increase timer resolution");
+      Sleep(2000);
+      return 3;
+    }
+  
 
   DLL_INFO dll;
   bool dll_successfully_loaded = LoadDLL(&dll);
@@ -138,7 +180,8 @@ int main(){
   }
 
   SDL_Setup();
-  dll.initialize(gameData);
+  gameData->fallback = AssetManagement::LoadSprite(gameData->arena_images, renderer, "fallback.png");
+  dll.initialize(gameData, renderer);
 
   bool running = true;
   float dt;
@@ -154,12 +197,36 @@ int main(){
       if (running==false){
         break;
       }
+
+      if(event.type == SDL_EVENT_KEY_DOWN){
+        if(event.key.key == SDLK_F9){
+          StoreGameState(arena_main);
+        }
+        if(event.key.key == SDLK_F10){
+          RetrieveGameStare(arena_main);
+        }
+      }
     }
     
   dll.update(gameData, dt);
   dll.draw(gameData, renderer);
-    
+
+  double time_to_sleep_ms;
+  
+  CalculateRemainingFrameTimeMS(&time_to_sleep_ms);
+    if (time_to_sleep_ms > 0){
+      if(time_to_sleep_ms > 1){
+        SDL_Delay(time_to_sleep_ms);
+      }
+      while (time_to_sleep_ms > 0){
+        CalculateRemainingFrameTimeMS(&time_to_sleep_ms);  
+      }
+    }
+    else{
+      printf("missed Frame \n");
+    }
   }
+
 
   dll.quit(renderer);
   SDL_Quit();

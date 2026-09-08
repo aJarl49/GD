@@ -18,3 +18,9 @@ void Memory::Reset(Arena* arena){
 	arena->used = 0;
 }
 
+Memory::Arena* Memory::CreateSubArena(Arena* parent_arena, size_t size){
+	Memory::Arena* sub_arena = (Memory::Arena*)Allocate(parent_arena, sizeof(Memory::Arena));
+	void* memory_start = Allocate(parent_arena, size);
+	Memory:Initialize(sub_arena, memory_start, size);
+	return sub_arena;
+}

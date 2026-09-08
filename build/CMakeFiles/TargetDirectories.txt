@@ -1,0 +1,5 @@
+C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_common.dir
+C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner.dir
+C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir
+C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/edit_cache.dir
+C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/rebuild_cache.dir
