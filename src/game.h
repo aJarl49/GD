@@ -5,7 +5,7 @@
 
 
 extern "C" {
-	__declspec(dllexport) void Initialize(GameData* data, SDL_Renderer* renderer);
+	__declspec(dllexport) void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer);
 	__declspec(dllexport) bool HandleEvents(GameData* data, SDL_Event event);
 	__declspec(dllexport) void Draw(GameData* data, SDL_Renderer* renderer);
 	__declspec(dllexport) void Update(GameData* data, float dt);
@@ -16,4 +16,4 @@ bool KeyPressed(SDL_Scancode key, const bool* current, const bool* previous);
 bool KeyHeld(SDL_Scancode key, const bool* current, const bool* previous);
 bool KeyReleased(SDL_Scancode key, const bool* current, const bool* previous);
 
-bool TryMove(Entity* mover, LevelData* level, int xDir, int yDir);
+bool TryMove(Entity* mover, LevelData* level,CommandBuffer* cmd_buffer, int xDir, int yDir, int timestamp);

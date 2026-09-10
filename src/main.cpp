@@ -12,11 +12,14 @@
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_stdinc.h"
+#include "SDL3/SDL_surface.h"
 #include "SDL3/SDL_timer.h"
 
 #include "common.h"
 #include "arena.h"
 #include "gameState.h"
+#include "dev_gui.h"
+#include "imgui/imgui.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -28,7 +31,7 @@ Uint64 PREV = 0;
 constexpr const char* NAME_OF_DLL = "Heartburner_game.dll";
 constexpr const char* NAME_OF_TEMP_DLL = "Heartburner_temp.dll";
 
-typedef void (*Function_Initialize) (GameData* data, SDL_Renderer* renderer);
+typedef void (*Function_Initialize) (GameData* data, SDL_Window* window, SDL_Renderer* renderer);
 typedef bool (*Function_HandleEvents) (GameData* data, SDL_Event event);
 typedef void (*Function_Update) (GameData* data, float dt);
 typedef void (*Function_Draw) (GameData* data, SDL_Renderer* renderer);
@@ -110,6 +113,7 @@ void SDL_Setup(){
   SDL_Init(SDL_INIT_EVENTS);
   window = SDL_CreateWindow("Heartburner", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
   renderer = SDL_CreateRenderer(window, NULL);
+  SDL_SetDefaultTextureScaleMode(renderer, SDL_SCALEMODE_PIXELART); // for K-Nearest
 }
 
 void CalculateDeltaTime(float* dt){
@@ -129,7 +133,7 @@ void DLL_CheckStatus(DLL_INFO* dll){
 }
 
 void CalculateRemainingFrameTimeMS(double* miliseconds){
-  Uint64 frame_end_time_ns = SDL_GetTicks();
+  Uint64 frame_end_time_ns = SDL_GetTicksNS();
   double frame_time_spent_ns = frame_end_time_ns - PREV;
   double frame_time_spent_ms = frame_time_spent_ns/1e6;
   *miliseconds = FRAME_TIME_MS - frame_time_spent_ms;
@@ -159,10 +163,16 @@ int main(){
     gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
     gameData->arena_levels = Memory::CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
-
+    gameData->arena_commands = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
+    
+    gameData->levelCount = 5;
     gameData->levels = (LevelData*)Memory::Allocate(gameData->arena_levels, sizeof(LevelData) *12);
-
     gameData->keys_previous = (bool*)Memory::Allocate(gameData->arena_levels, sizeof(bool) * SDL_SCANCODE_COUNT);
+
+    gameData->commandBuffer = (CommandBuffer*)Memory::Allocate(arena_main, sizeof(CommandBuffer));
+    gameData->commandBuffer->capacity = 2000;
+    size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->commandBuffer->capacity;
+    gameData->commandBuffer->allCommands = (AnyCommand*)Memory::Allocate(gameData->arena_commands, COMMAND_SIZE);
 
   MMRESULT result = timeBeginPeriod(1);
     if(result == TIMERR_NOCANDO){
@@ -181,10 +191,11 @@ int main(){
 
   SDL_Setup();
   gameData->fallback = AssetManagement::LoadSprite(gameData->arena_images, renderer, "fallback.png");
-  dll.initialize(gameData, renderer);
+  dll.initialize(gameData,window, renderer);
 
   bool running = true;
   float dt;
+  gameData->dt = &dt;
   while (running){
   
     DLL_CheckStatus(&dll);
@@ -223,7 +234,7 @@ int main(){
       }
     }
     else{
-      printf("missed Frame \n");
+     // printf("new exe \n");
     }
   }
 

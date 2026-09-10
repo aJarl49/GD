@@ -1,5 +1,6 @@
 #include "rendering.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_surface.h"
 #include "common.h"
 
 void RenderSprite(Image* sprite, SDL_Renderer* renderer, int xPos, int yPos, float scale){
