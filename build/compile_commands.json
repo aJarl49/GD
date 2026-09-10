@@ -19,6 +19,12 @@
 },
 {
   "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
+  "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner.dir\\src\\input.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\input.cpp",
+  "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/input.cpp",
+  "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner.dir/src/input.cpp.obj"
+},
+{
+  "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
   "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner.dir\\src_external\\imgui\\imgui.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src_external\\imgui\\imgui.cpp",
   "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src_external/imgui/imgui.cpp",
   "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner.dir/src_external/imgui/imgui.cpp.obj"
@@ -61,6 +67,12 @@
 },
 {
   "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
+  "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -DHeartburner_game_EXPORTS -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner_game.dir\\src\\camera.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\camera.cpp",
+  "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/camera.cpp",
+  "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir/src/camera.cpp.obj"
+},
+{
+  "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
   "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -DHeartburner_game_EXPORTS -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner_game.dir\\src\\command.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\command.cpp",
   "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/command.cpp",
   "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir/src/command.cpp.obj"
@@ -73,6 +85,12 @@
 },
 {
   "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
+  "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -DHeartburner_game_EXPORTS -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner_game.dir\\src\\entity.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\entity.cpp",
+  "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/entity.cpp",
+  "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir/src/entity.cpp.obj"
+},
+{
+  "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
   "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -DHeartburner_game_EXPORTS -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner_game.dir\\src\\game.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\game.cpp",
   "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/game.cpp",
   "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir/src/game.cpp.obj"
@@ -82,6 +100,12 @@
   "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -DHeartburner_game_EXPORTS -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner_game.dir\\src\\image.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\image.cpp",
   "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/image.cpp",
   "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir/src/image.cpp.obj"
+},
+{
+  "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",
+  "command": "\"C:\\Program Files\\LLVM\\bin\\clang++.exe\" -DHeartburner_game_EXPORTS -IC:/Users/jarla/Desktop/Game_Projects/GDProject/include -IC:/Users/jarla/Desktop/Game_Projects/GDProject/src_external -O0 -std=gnu++20 -D_DEBUG -D_DLL -D_MT -Xclang --dependent-lib=msvcrtd -g -Xclang -gcodeview -o CMakeFiles\\Heartburner_game.dir\\src\\input.cpp.obj -c C:\\Users\\jarla\\Desktop\\Game_Projects\\GDProject\\src\\input.cpp",
+  "file": "C:/Users/jarla/Desktop/Game_Projects/GDProject/src/input.cpp",
+  "output": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build/CMakeFiles/Heartburner_game.dir/src/input.cpp.obj"
 },
 {
   "directory": "C:/Users/jarla/Desktop/Game_Projects/GDProject/build",

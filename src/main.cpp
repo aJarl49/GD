@@ -20,6 +20,7 @@
 #include "gameState.h"
 #include "dev_gui.h"
 #include "imgui/imgui.h"
+#include "input.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -159,15 +160,28 @@ int main(){
     Memory::Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
     GameData* gameData = (GameData*)Memory::Allocate(arena_main, sizeof(GameData));
 
-    size_t IMAGE_ARENA_SIZE = sizeof(Image) * 100;
+    size_t IMAGE_ARENA_SIZE = sizeof(Image)*1024;
+    size_t INPUT_ARENA_SIZE = 0;
+    INPUT_ARENA_SIZE += sizeof(bool) * SDL_SCANCODE_COUNT * 2;
+    INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT;
+    INPUT_ARENA_SIZE += 128;
+    
     gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
+    gameData->arena_input = Memory::CreateSubArena(arena_main, INPUT_ARENA_SIZE);
     gameData->arena_levels = Memory::CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
     gameData->arena_commands = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
     
     gameData->levelCount = 5;
     gameData->levels = (LevelData*)Memory::Allocate(gameData->arena_levels, sizeof(LevelData) *12);
-    gameData->keys_previous = (bool*)Memory::Allocate(gameData->arena_levels, sizeof(bool) * SDL_SCANCODE_COUNT);
+    gameData->input_buffer_capacity = 50;
+    size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->input_buffer_capacity;
+    gameData->input_buffer = (Position*)Memory::Allocate(gameData->arena_levels, RING_BUFFER_SIZE);
+
+
+    gameData->input.keys_current = (bool*)Memory::Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
+    gameData->input.keys_previous = (bool*)Memory::Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
+    gameData->input.keys_held_time = (float*)Memory::Allocate(gameData->arena_input, sizeof (float) * SDL_SCANCODE_COUNT);
 
     gameData->commandBuffer = (CommandBuffer*)Memory::Allocate(arena_main, sizeof(CommandBuffer));
     gameData->commandBuffer->capacity = 2000;
@@ -218,8 +232,10 @@ int main(){
         }
       }
     }
-    
+
+  gameData->input.keys_current = SDL_GetKeyboardState(nullptr);
   dll.update(gameData, dt);
+  UpdateKeys(&gameData->input, dt);
   dll.draw(gameData, renderer);
 
   double time_to_sleep_ms;

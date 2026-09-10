@@ -3,6 +3,8 @@
 #include "image.h"
 #include "levels.h"
 #include "command.h"
+#include "input.h"
+#include "camera.h"
 #include "imgui/imgui_internal.h"
 
 struct GameData {
@@ -10,7 +12,8 @@ struct GameData {
   uint32_t command_timestamp;
   SDL_FRect rect;
   float move_speed;
-  bool* keys_previous;
+  Input input;
+  Camera camera;
   Image* beton;
   Image* dry_sand;
   Image* player;
@@ -22,6 +25,7 @@ struct GameData {
   Memory::Arena* arena_entities;
   Memory::Arena* arena_images;
   Memory::Arena* arena_commands;
+  Memory::Arena* arena_input;
   LevelData* levels;
   int currentLevelIndex;
   int levelCount;
@@ -31,4 +35,8 @@ struct GameData {
     return &levels[currentLevelIndex];
   }
   ImGuiContext* imGui_context;
+  Position* input_buffer;
+  int input_buffer_capacity;
+  int input_buffer_write_count;
+  int input_buffer_read_count;
 };

@@ -1,9 +1,11 @@
 #include "levelRenderer.h"
 #include "common.h"
 #include "entity.h"
+#include "game.h"
 #include "rendering.h"
 #include <cstdint>
 #include <winscard.h>
+#include <cmath>
 
 void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
   LevelData lvl = gameData->levels[gameData->currentLevel];
@@ -44,26 +46,26 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
           break;
       }
 
-      float xPos = x * CELL_SIZE_PX;
-      float yPos = y * CELL_SIZE_PX;
+//      float xPos = x * CELL_SIZE_PX;
+//      float yPos = y * CELL_SIZE_PX;
 
-      xPos += SCREEN_WIDTH / 2.0;
-      yPos += SCREEN_HEIGHT / 2.0;
+//      xPos += SCREEN_WIDTH / 2.0;
+//      yPos += SCREEN_HEIGHT / 2.0;
 
-      xPos -= board_width_px_half;
-      yPos -= board_height_px_half;
+//      xPos -= board_width_px_half;
+//      yPos -= board_height_px_half;
 
-      RenderSprite(sprite, renderer, xPos, yPos);
+      RenderSprite_Grid(sprite, &lvl, renderer, &gameData->camera, x, y);
     }
   }
 }
 
 
 void RenderEntities(GameData* data, SDL_Renderer* renderer){
-  LevelData lvlData = data->levels[data->currentLevel];
-  for(int i = 0; i < lvlData.entityCount; i++){
+  LevelData lvl = data->levels[data->currentLevel];
+  for(int i = 0; i < lvl.entityCount; i++){
     Image* img;
-    Entity entity = lvlData.entityBuffer[i];
+    Entity entity = lvl.entityBuffer[i];
     switch(entity.id){
       case ID::PLAYER:
         img = data -> player;
@@ -74,18 +76,21 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer){
       
     }
 
-    int xPos = 0;
-    int yPos = 0;
+//    int xPos = 0;
+//    int yPos = 0;
 
-    xPos += SCREEN_WIDTH/2.0;
-    yPos += SCREEN_HEIGHT/2.0;
+//    xPos += SCREEN_WIDTH/2.0;
+//    yPos += SCREEN_HEIGHT/2.0;
 
-    xPos -= data->levels[data->currentLevel].w * CELL_SIZE_PX/2;
-    yPos -= data->levels[data->currentLevel].h * CELL_SIZE_PX/2;
+//    xPos -= data->levels[data->currentLevel].w * CELL_SIZE_PX/2;
+//    yPos -= data->levels[data->currentLevel].h * CELL_SIZE_PX/2;
 
-    xPos += entity.x * CELL_SIZE_PX;
-    yPos += entity.y * CELL_SIZE_PX;
+    float x_animated = std::lerp(entity.x_prev, entity.x, entity.progress_01);
+    float y_animated = std::lerp(entity.y_prev, entity.y, entity.progress_01);
 
-    RenderSprite(img, renderer, xPos, yPos);
+//    xPos += x_animated * CELL_SIZE_PX;
+//    yPos += y_animated * CELL_SIZE_PX;
+
+    RenderSprite_Grid(img, &lvl, renderer, &data->camera, x_animated, y_animated);
   }
 }
