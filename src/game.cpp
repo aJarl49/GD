@@ -17,16 +17,9 @@ extern "C"{
 	void Initialize(GameData* data, SDL_Window* window,SDL_Renderer* renderer){
 		DEV::Initialize(window, renderer);
 		data->imGui_context = ImGui::GetCurrentContext();
-		data->beton = AssetManagement::LoadSprite(data->arena_images, renderer, "beton.png");
-		data->dry_sand = AssetManagement::LoadSprite(data->arena_images, renderer, "dry_sand.png");
-		data->fallback = AssetManagement::LoadSprite(data->arena_images, renderer, "fallback.png");
-		data->grass = AssetManagement::LoadSprite(data->arena_images, renderer, "grass.png");
-		data->player = AssetManagement::LoadSprite(data->arena_images, renderer, "player.png");
-		data->water = AssetManagement::LoadSprite(data->arena_images, renderer, "water.png");
-		data->wet_sand = AssetManagement::LoadSprite(data->arena_images, renderer, "wet_sand.png");
-		
+		AssetManagement::LoadAllSprites(data->spriteBuffer, renderer);		
 		data -> currentLevelIndex = 0;
-		CreateLevel(data->arena_levels, &data->levels[0], "assets/levels/island_1_big.tmj");
+		CreateLevel(data->arena_levels, &data->levels[0], "assets/levels/island_1_all.tmj");
 		CreateEntities(&data->levels[data->currentLevelIndex], data->arena_entities);
 		}
 	}
@@ -51,7 +44,7 @@ bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDi
 	Entity* stepInto_entity = level->GetEntity(test_x, test_y);
 	ID stepInto_tile_id = (ID)level->GetCellID(test_x, test_y);
 	if(stepInto_entity == nullptr){
-		if(stepInto_tile_id == ID::DRY_SAND){
+		if(stepInto_tile_id == ID::DRY_SAND || stepInto_tile_id == ID::GRASS){
 			MoveCommand mv;
 			mv.type = CMD_TYPE::MOVE;
 			mv.entity = mover;

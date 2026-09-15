@@ -1,6 +1,8 @@
 #include "input.h"
 #include <cstring>
 
+
+//keyboard
 bool KeyPressed(const Input* input, SDL_Scancode key){
   if(input->keys_previous == nullptr){
     return input->keys_current[key];
@@ -46,4 +48,60 @@ void ResetAll(Input* input){
   memset((void*)input->keys_current, 0, sizeof(bool) * SDL_SCANCODE_COUNT);
   memset((void*)input->keys_previous, 0, sizeof(bool) * SDL_SCANCODE_COUNT);
   memset((void*)input->keys_held_time, 0, sizeof(float) * SDL_SCANCODE_COUNT);
+}
+
+//mouse
+
+SDL_MouseButtonFlags ButtonToFlag(MouseButtons button){
+  switch(button){
+    case MouseButtons::LEFT:
+      return SDL_BUTTON_LMASK;
+    case MouseButtons::MIDDLE:
+      return SDL_BUTTON_MMASK;
+    case MouseButtons::RIGHT:
+      return SDL_BUTTON_RMASK;
+      break;
+  }
+}
+
+bool MousePressed(const Input* input, MouseButtons button){
+  SDL_MouseButtonFlags flag = ButtonToFlag(button);
+  return (input->mouse_current & flag) != 0 && (input->mouse_previous & flag) == 0;
+}
+
+bool MouseReleased(const Input* input, MouseButtons button){
+  SDL_MouseButtonFlags flag = ButtonToFlag(button);
+  return (input->mouse_current & flag) == 0 && (input->mouse_previous & flag) != 0;
+}
+
+bool MouseHeld(const Input* input, MouseButtons button){
+  SDL_MouseButtonFlags flag = ButtonToFlag(button);
+  return (input->mouse_current & flag) != 0 && (input->mouse_previous & flag) != 0;
+}
+
+bool MouseHeld_ForTime(const Input* input, MouseButtons button, float min_lenght){
+  SDL_MouseButtonFlags flag = ButtonToFlag(button);
+  return input->mouse_held_time[flag] >= min_lenght;
+}
+
+void UpdateMouse(Input* input, float dt){
+  if(MouseHeld(input, MouseButtons::LEFT)){
+    input->mouse_held_time[(int)MouseButtons::LEFT] += dt;
+  }
+  else{
+    input->mouse_held_time[(int)MouseButtons::LEFT] = 0;
+  }
+  if(MouseHeld(input, MouseButtons::MIDDLE)){
+    input->mouse_held_time[(int)MouseButtons::MIDDLE] += dt;
+  }
+  else{
+    input->mouse_held_time[(int)MouseButtons::MIDDLE] = 0;
+  }
+  if(MouseHeld(input, MouseButtons::RIGHT)){
+    input->mouse_held_time[(int)MouseButtons::RIGHT] += dt;
+  }
+  else{
+    input->mouse_held_time[(int)MouseButtons::RIGHT] = 0;
+  }
+  input->mouse_previous = input->mouse_current;
 }

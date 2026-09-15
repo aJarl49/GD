@@ -6,6 +6,7 @@
 #include "input.h"
 #include "camera.h"
 #include "imgui/imgui_internal.h"
+#include "spriteLibrary.h"
 
 struct GameData {
   const float* dt;
@@ -14,13 +15,7 @@ struct GameData {
   float move_speed;
   Input input;
   Camera camera;
-  Image* beton;
-  Image* dry_sand;
-  Image* player;
-  Image* fallback;
-  Image* grass;
-  Image* water;
-  Image* wet_sand;
+  Sprite* spriteBuffer;
   Memory::Arena* arena_levels;
   Memory::Arena* arena_entities;
   Memory::Arena* arena_images;

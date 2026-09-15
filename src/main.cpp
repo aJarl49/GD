@@ -21,6 +21,7 @@
 #include "dev_gui.h"
 #include "imgui/imgui.h"
 #include "input.h"
+#include "spriteLibrary.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -160,13 +161,15 @@ int main(){
     Memory::Initialize(arena_main, game_memory, GAME_MEMORY_ALLOWANCE);
     GameData* gameData = (GameData*)Memory::Allocate(arena_main, sizeof(GameData));
 
-    size_t IMAGE_ARENA_SIZE = sizeof(Image)*1024;
+    int SPRITE_COUNT = 256;
+    size_t IMAGE_ARENA_SIZE = sizeof(Sprite)*SPRITE_COUNT;
     size_t INPUT_ARENA_SIZE = 0;
     INPUT_ARENA_SIZE += sizeof(bool) * SDL_SCANCODE_COUNT * 2;
     INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT;
     INPUT_ARENA_SIZE += 128;
     
     gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
+    gameData->spriteBuffer = (Sprite*)Memory::Allocate(gameData->arena_images, sizeof(Sprite) * SPRITE_COUNT);
     gameData->arena_input = Memory::CreateSubArena(arena_main, INPUT_ARENA_SIZE);
     gameData->arena_levels = Memory::CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
@@ -182,6 +185,8 @@ int main(){
     gameData->input.keys_current = (bool*)Memory::Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
     gameData->input.keys_previous = (bool*)Memory::Allocate(gameData->arena_input, sizeof(bool) * SDL_SCANCODE_COUNT);
     gameData->input.keys_held_time = (float*)Memory::Allocate(gameData->arena_input, sizeof (float) * SDL_SCANCODE_COUNT);
+
+    gameData->input.mouse_held_time = (float*)Memory::Allocate(gameData->arena_input, sizeof(float) * 3); // 3 for 3 buttons of the mouse
 
     gameData->commandBuffer = (CommandBuffer*)Memory::Allocate(arena_main, sizeof(CommandBuffer));
     gameData->commandBuffer->capacity = 2000;
@@ -204,7 +209,6 @@ int main(){
   }
 
   SDL_Setup();
-  gameData->fallback = AssetManagement::LoadSprite(gameData->arena_images, renderer, "fallback.png");
   dll.initialize(gameData,window, renderer);
 
   bool running = true;
@@ -234,8 +238,13 @@ int main(){
     }
 
   gameData->input.keys_current = SDL_GetKeyboardState(nullptr);
+  gameData->input.mouse_current = SDL_GetMouseState(&gameData->input.mouse_x, &gameData->input.mouse_y);
+  
   dll.update(gameData, dt);
+  
   UpdateKeys(&gameData->input, dt);
+  UpdateMouse(&gameData->input, dt);
+  
   dll.draw(gameData, renderer);
 
   double time_to_sleep_ms;
