@@ -10,7 +10,7 @@ struct Editor{
 
 namespace EDITOR{
   void DrawObjectPanel(Editor* editor, Sprite* spriteBuffer);
-  void PlaceObject(const int x, const int y, Editor* editor, LevelData* level);
-  void Update(Editor* editor, Input* input, LevelData* level);
+  void PlaceObject(const int x, const int y, Editor* editor, LevelData* level, CommandBuffer* commandBuffer);
+  void Update(Editor* editor, Input* input, LevelData* level, CommandBuffer* commandBuffer);
   void DrawPreview(Editor* editor, Input* inpput, SDL_Renderer* renderer, LevelData* level, Camera* camera, Sprite* spriteBuffer);
 }

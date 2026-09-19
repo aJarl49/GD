@@ -82,7 +82,7 @@ void Update(GameData* data, float dt){
 		data->edit_level = !data->edit_level;
 	}
 	if(data->edit_level){
-		EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel());
+		EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel(), data->commandBuffer);
 	}
 	
 	const bool* keys = SDL_GetKeyboardState(nullptr);
@@ -93,7 +93,7 @@ void Update(GameData* data, float dt){
 			Redo(data->commandBuffer, data->levels);
 		}
 		else{
-			Undo(data->commandBuffer);
+			Undo(data->commandBuffer, data->levels);
 		}
 	}
 
