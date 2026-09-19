@@ -35,50 +35,62 @@ bool HandleEvents(GameData* data, SDL_Event event){
 	return true;
 }
 
-bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int timestamp){
-	if(mover->HasBehaviour(CAN_MOVE) == false){
+bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmd_buffer, int xDir, int yDir, int strength){
+	if (strength < 0){
+		return false;
+	}
+	if(HasBehaviour(mover,(CAN_MOVE)) == false){
 		return false;
 	}
 	int test_x = mover->x + xDir;
 	int test_y = mover->y + yDir;
-	Entity* stepInto_entity = level->GetEntity(test_x, test_y);
-	ID stepInto_tile_id = (ID)level->GetCellID(test_x, test_y);
+	Entity* stepInto_entity = GetEntity(level, test_x, test_y);
+	ID stepInto_tile_id = (ID)GetCellID(level, test_x, test_y);
 	if(stepInto_entity == nullptr){
 		if(stepInto_tile_id == ID::DRY_SAND || stepInto_tile_id == ID::GRASS){
-			MoveCommand mv;
+			MoveCommand mv (mover, xDir, yDir);
 			mv.type = CMD_TYPE::MOVE;
 			mv.entity = mover;
 			mv.xDir = xDir;
 			mv.yDir = yDir;
-			Push(cmd_buffer, mv, timestamp);
+			Push(cmd_buffer, mv, level);
 			return true;
 		}
 		return false;
 	}
 
-	if (stepInto_entity->HasBehaviour(CAN_MOVE)){
-		if (TryMove(stepInto_entity, level, cmd_buffer, xDir, yDir, timestamp)){
-			MoveCommand mv;
+	if (HasBehaviour(stepInto_entity,CAN_MOVE) && !HasBehaviour(stepInto_entity, UNPUSHABLE)){
+		if (TryMove(stepInto_entity, level, cmd_buffer, xDir, yDir, --strength)){
+			MoveCommand mv (mover, xDir, yDir);
+			AddBehaviour(mover, Behaviour::IS_PUSHING);
 			mv.type = CMD_TYPE::MOVE;
 			mv.entity = mover;
 			mv.xDir = xDir;
 			mv.yDir = yDir;
-			Push(cmd_buffer, mv, timestamp);
+			Push(cmd_buffer, mv, level);
 			return true;
 		}
+		
 	}
 	return false;
 }
 
 	
 void Update(GameData* data, float dt){
+
+	if (KeyPressed(&data->input, SDL_SCANCODE_F2)){
+		data->edit_level = !data->edit_level;
+	}
+	if(data->edit_level){
+		EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel());
+	}
 	
 	const bool* keys = SDL_GetKeyboardState(nullptr);
 	
 	if (KeyPressed(&data->input, SDL_SCANCODE_Z) || KeyHeld_ForTime(&data->input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME)){
 		ResetKeyHeldTime(&data->input, SDL_SCANCODE_Z);
 		if(KeyHeld(&data->input, SDL_SCANCODE_LSHIFT)){
-			Redo(data->commandBuffer);
+			Redo(data->commandBuffer, data->levels);
 		}
 		else{
 			Undo(data->commandBuffer);
@@ -105,7 +117,7 @@ void Update(GameData* data, float dt){
 	bool are_entities_moving = false;
 		for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
 			Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
-			if(entity->HasBehaviour(CAN_MOVE) && IsMoving(entity)){
+			if(HasBehaviour(entity, (CAN_MOVE)) && IsMoving(entity)){
 				entity->progress_01 += MOVE_SPEED * dt;
 				if(entity->progress_01 >= 1){
 					entity->progress_01 = 0;
@@ -122,15 +134,25 @@ void Update(GameData* data, float dt){
 			if(data->input_buffer_read_count == data->input_buffer_write_count){
 				return;
 			}
-
-			data->command_timestamp += 1;
-
+			
 			for (int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
 				Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
-				if(entity->HasBehaviour((Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
+				if(HasBehaviour(entity, Behaviour::IS_PUSHING)){
+					RemoveBehaviour(entity, Behaviour::IS_PUSHING);
+				}
+				if(HasBehaviour(entity,(Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
+					if(HasBehaviour(entity, Behaviour::IS_PETRIFIED)){
+						continue;
+					}
 					int xDir = data->input_buffer[data->input_buffer_read_count % data->input_buffer_capacity].x;
 					int yDir = data->input_buffer[data->input_buffer_read_count % data->input_buffer_capacity].y;
-					TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, data->command_timestamp);
+
+					Direction new_facing = DirectionFromXY(xDir, yDir);
+					if (new_facing != entity->facing){
+						RotateCommand rotate(entity, entity->facing, new_facing);
+						Push(data->commandBuffer, rotate, data->GetCurrentLevel());
+					}
+					TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, entity->strength);
 				}
 			}
 			data->input_buffer_read_count++;

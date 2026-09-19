@@ -7,15 +7,17 @@
 #include "camera.h"
 #include "imgui/imgui_internal.h"
 #include "spriteLibrary.h"
+#include "levelEditor.h"
 
 struct GameData {
   const float* dt;
-  uint32_t command_timestamp;
   SDL_FRect rect;
   float move_speed;
   Input input;
   Camera camera;
   Sprite* spriteBuffer;
+  Memory::Arena* arena_main;
+  Memory::Arena* arena_scratch;
   Memory::Arena* arena_levels;
   Memory::Arena* arena_entities;
   Memory::Arena* arena_images;
@@ -34,4 +36,6 @@ struct GameData {
   int input_buffer_capacity;
   int input_buffer_write_count;
   int input_buffer_read_count;
+  bool edit_level;
+  Editor editorData;
 };

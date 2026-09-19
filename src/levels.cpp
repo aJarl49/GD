@@ -10,6 +10,20 @@ using namespace std;
 const int LEVEL_INDEX = 0;
 const int ENTITIES_INDEX = 1;
 
+uint8_t GetCellID(LevelData* level, int x, int y){
+return level->cells[y * level->w + x];
+}
+
+Entity* GetEntity(LevelData* level, int x, int y){
+for (int i = 0; i < level->entityCount; i++){
+  if (level->entityBuffer[i].x == x && level->entityBuffer[i].y == y){
+	return &level->entityBuffer[i];
+  }
+}
+return nullptr;
+}
+
+
 void CreateLevel(Arena* arena, LevelData* level, const char* level_name){
   fstream stream(level_name);
   auto jsonResult = nlohmann::json::parse(stream);
@@ -31,26 +45,85 @@ void CreateEntities(LevelData* lvl_data, Arena* arena){
   auto result = nlohmann::json::parse(stream);
   auto entityData = result["layers"][ENTITIES_INDEX]["data"].get<vector<uint8_t>>();
 
-  for (int i = 0; i<lvl_data->w * lvl_data->h; i++){
-    unsigned char entity_id = entityData[i];
-    if(entity_id!=0){
-      lvl_data->entityCount++;
-    }
-  }
+  lvl_data->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof (Entity) * 256);
 
-  lvl_data->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof (Entity) * lvl_data->entityCount);
-  int index = 0;
   for (int i = 0; i < lvl_data->w * lvl_data->h; i++){
     unsigned char entity_id = entityData[i];
     if(entity_id != 0){
       int x = i% lvl_data->w;
       int y = i/ lvl_data->w;
-      lvl_data->entityBuffer[index].id = (ID)entity_id;
-      lvl_data->entityBuffer[index].InitializeBaseBehaviour();
-      lvl_data->entityBuffer[index].x = x;
-      lvl_data->entityBuffer[index].y = y;
-      index +=1;
+      AddEntity((ID)entity_id, x, y, lvl_data);
     }
   }
   
+}
+
+//LevelEditor
+ Entity* GetNextAvailableEntity(LevelData* level){
+  for (int i = 0; i < level->entityCount; i++){
+    if (level->entityBuffer[i].id == ID::NONE){
+      return &level->entityBuffer[i];
+    }
+  }
+  return &level->entityBuffer[level->entityCount++];
+}
+
+void AddEntity(ID entity_id, int x, int y, LevelData* level){
+  Entity* entity = GetEntity(level, x,y);
+
+  if (entity==nullptr){
+    entity = GetNextAvailableEntity(level);
+  }
+
+  entity->x = x;
+  entity->y = y;
+  entity->x_prev = x;
+  entity->y_prev = y;
+  entity->id = entity_id;
+  InitializeBaseBehaviour(entity);
+}
+
+void RemoveEntity(int x, int y, LevelData*level){
+  Entity* entity = GetEntity(level, x, y);
+  if(entity == nullptr){
+    return;
+  }
+
+  *entity = {};
+}
+
+Entity* RaycastFirstEntity(int x_origin, int y_origin, Direction direction, LevelData* level, bool ignore_walls){
+  Position facingVector;
+    switch(direction){
+      case Direction::RIGHT:
+        facingVector = {1, 0};
+        break;
+      case Direction::LEFT:
+        facingVector = {-1, 0};
+        break;
+      case Direction::UP:
+        facingVector = {0, 1};
+        break;
+      case Direction::DOWN:
+        facingVector = {0, -1};
+        break;
+    }
+  int x_search = x_origin + facingVector.x;
+  int y_search = y_origin + facingVector.x;
+
+  while(x_search > 0 && x_search < level->w && y_search > 0 && y_search < level->h){
+    ID cellID = (ID)GetCellID(level, x_search, y_search);
+    if(cellID == ID::WET_SAND && !ignore_walls){
+      break;
+    }
+    Entity* entity_search = GetEntity(level, x_search, y_search);
+    if(entity_search !=nullptr){
+      return entity_search;
+    }
+
+    x_search += facingVector.x;
+    y_search += facingVector.y;
+  }
+
+  return nullptr;
 }

@@ -13,4 +13,4 @@ extern "C" {
 }
 
 
-bool TryMove(Entity* mover, LevelData* level,CommandBuffer* cmd_buffer, int xDir, int yDir, int timestamp);
+bool TryMove(Entity* mover, LevelData* level,CommandBuffer* cmd_buffer, int xDir, int yDir, int strength);

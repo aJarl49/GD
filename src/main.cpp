@@ -114,8 +114,8 @@ void* AllocateGameMemory(){
 void SDL_Setup(){
   SDL_Init(SDL_INIT_EVENTS);
   window = SDL_CreateWindow("Heartburner", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
-  renderer = SDL_CreateRenderer(window, NULL);
   SDL_SetDefaultTextureScaleMode(renderer, SDL_SCALEMODE_PIXELART); // for K-Nearest
+  renderer = SDL_CreateRenderer(window, NULL);
 }
 
 void CalculateDeltaTime(float* dt){
@@ -167,13 +167,15 @@ int main(){
     INPUT_ARENA_SIZE += sizeof(bool) * SDL_SCANCODE_COUNT * 2;
     INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT;
     INPUT_ARENA_SIZE += 128;
-    
+
+    gameData->arena_main = arena_main;
     gameData->arena_images = Memory::CreateSubArena(arena_main, IMAGE_ARENA_SIZE);
     gameData->spriteBuffer = (Sprite*)Memory::Allocate(gameData->arena_images, sizeof(Sprite) * SPRITE_COUNT);
     gameData->arena_input = Memory::CreateSubArena(arena_main, INPUT_ARENA_SIZE);
     gameData->arena_levels = Memory::CreateSubArena(arena_main, MEGABYTES(3));
     gameData->arena_entities = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
     gameData->arena_commands = Memory::CreateSubArena(gameData->arena_levels, MEGABYTES(1));
+    gameData->arena_scratch = Memory::CreateSubArena(gameData->arena_main, KILOBYTES(256));
     
     gameData->levelCount = 5;
     gameData->levels = (LevelData*)Memory::Allocate(gameData->arena_levels, sizeof(LevelData) *12);
@@ -218,6 +220,8 @@ int main(){
   
     DLL_CheckStatus(&dll);
 
+    Reset(gameData->arena_scratch);
+    
     CalculateDeltaTime(&dt);
 
     SDL_Event event;
